@@ -1,5 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
+import connectDB from "./config/connection.js";
+import userRoutes from "./routes/userRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -7,8 +9,14 @@ dotenv.config();
 // Create Express app
 const app = express();
 
-// // Connect to MongoDB
-// connectDB();
+// Connect to MongoDB
+connectDB();
+
+// Middleware to read JSON request bodies
+app.use(express.json());
+
+// User routes
+app.use("/api/users", userRoutes);
 
 // Home route
 app.get("/", (req, res) => {
