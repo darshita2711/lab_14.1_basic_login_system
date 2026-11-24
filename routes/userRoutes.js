@@ -1,5 +1,6 @@
 import express from "express";
 import User from "../models/User.js";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
@@ -41,4 +42,46 @@ router.post("/register", async (req, res) => {
   }
 });
 
+
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Find user by email
+    const user = await User.findOne({ email });
+
+
+    // Compare entered password with hashed password
+    const isPasswordCorrect = await user.isCorrectPassword(password);
+
+    // Generate JWT token
+    const token = jwt.sign(
+      {
+        _id: user._id,
+        username: user.username
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h"
+      }
+    );
+
+    // Send successful login response
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email
+      }
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Login failed",
+      error: error.message
+    });
+  }
+});
 export default router;
