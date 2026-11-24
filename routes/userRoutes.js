@@ -54,6 +54,12 @@ router.post("/login", async (req, res) => {
     // Compare entered password with hashed password
     const isPasswordCorrect = await user.isCorrectPassword(password);
 
+    if (!isPasswordCorrect) {
+      return res.status(400).json({
+        message: "Invalid email or password"
+      });
+    }
+
     // Generate JWT token
     const token = jwt.sign(
       {
